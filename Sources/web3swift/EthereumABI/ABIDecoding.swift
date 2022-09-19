@@ -100,7 +100,7 @@ extension ABIDecoder {
             guard elementItself.count >= 32+length else {break}
             dataSlice = elementItself[32 ..< 32 + length]
             //            print("Bytes element is: \n" + String(dataSlice.toHexString()))
-            return (dataSlice as AnyObject, type.memoryUsage)
+            return (dataSlice as AnyObject, nextElementPointer)
         case .array(type: let subType, length: let length):
             switch type.arraySize {
             case .dynamicSize:
@@ -135,7 +135,12 @@ extension ABIDecoder {
                         let (v, c) = decodeSingleType(type: subType, data: dataSlice, pointer: subpointer)
                         guard let valueUnwrapped = v, let consumedUnwrapped = c else {break}
                         toReturn.append(valueUnwrapped)
-                        subpointer = subpointer + consumedUnwrapped
+                        if (subType.isStatic) {
+                            subpointer = subpointer + consumedUnwrapped
+                        }
+                        else {
+                            subpointer = consumedUnwrapped // need to go by nextElementPointer
+                        }
                     }
                     return (toReturn as AnyObject, nextElementPointer)
                 }
