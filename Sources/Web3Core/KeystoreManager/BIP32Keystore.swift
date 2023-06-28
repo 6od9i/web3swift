@@ -227,6 +227,7 @@ public class BIP32Keystore: AbstractKeystore {
         var pathAppendix: String?
         
         return [Int](0..<number).compactMap({ number in
+            pathAppendix = nil
             let path = preffixPath + "/\(number)"
             if path.hasPrefix(prefixPath) {
                 let upperIndex = (path.range(of: prefixPath)?.upperBound)!
