@@ -216,7 +216,7 @@ public class BIP32Keystore: AbstractKeystore {
         try encryptDataToStorage(password, data: serializedRootNode, aesMode: self.keystoreParams!.crypto.cipher)
     }
 
-    func getAddressForAccount(password: String, path: String) throws -> EthereumAddress {
+    public func getAddressForAccount(password: String, path: String) throws -> EthereumAddress {
         guard let decryptedRootNode = try getPrefixNodeData(password) else {
             throw AbstractKeystoreError.encryptionError("Failed to decrypt a keystore")
         }
