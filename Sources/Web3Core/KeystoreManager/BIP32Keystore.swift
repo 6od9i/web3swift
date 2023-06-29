@@ -177,7 +177,7 @@ public class BIP32Keystore: AbstractKeystore {
         if path.hasPrefix(prefixPath) {
             let upperIndex = (path.range(of: prefixPath)?.upperBound)!
             if upperIndex < path.endIndex {
-                pathAppendix = String(path[path.index(after: upperIndex)])
+                pathAppendix = String(path[path.index(after: upperIndex)..<path.endIndex])
             } else {
                 throw AbstractKeystoreError.encryptionError("out of bounds")
             }
@@ -215,7 +215,14 @@ public class BIP32Keystore: AbstractKeystore {
         guard let serializedRootNode = rootNode.serialize(serializePublic: false) else {throw AbstractKeystoreError.keyDerivationError}
         try encryptDataToStorage(password, data: serializedRootNode, aesMode: self.keystoreParams!.crypto.cipher)
     }
-
+    
+    /// Fast generation addresses for current account
+    /// used for shows wich address user wiil get when changed number of his wallet
+    /// - Parameters:
+    ///   - password: password of seed storage
+    ///   - preffixPath: preffix of Derivation Path without account number
+    ///   - number: number of wallets adresses needed to generate from 0 to number-1
+    /// - Returns: Array of addresses generated from 0 to number bound, or empty array in case of error
     public func getAddressForAccount(password: String, preffixPath: String, number: Int) -> [EthereumAddress] {
         guard let decryptedRootNode = try? getPrefixNodeData(password) else {
             return []
@@ -232,7 +239,7 @@ public class BIP32Keystore: AbstractKeystore {
             if path.hasPrefix(prefixPath) {
                 let upperIndex = (path.range(of: prefixPath)?.upperBound)!
                 if upperIndex < path.endIndex {
-                    pathAppendix = String(path[path.index(after: upperIndex)])
+                    pathAppendix = String(path[path.index(after: upperIndex)..<path.endIndex])
                 } else {
                     return nil
                 }
